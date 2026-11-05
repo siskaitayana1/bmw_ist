@@ -32,8 +32,12 @@ def show_live_timer(seconds_remaining, email):
             if (elem) {{ elem.innerHTML = displayM + ":" + displayS; }}
             if (timeLeft <= 0) {{ 
                 if (elem) elem.innerHTML = "00:00 (WAKTU HABIS)"; 
-                var targetUrl = window.top.location.pathname + "?page=test&subtest=8&email={safe_email}";
-                setTimeout(function() {{ window.top.location.href = targetUrl; }}, 500);
+                var newSearch = "?page=test&subtest=8&email={safe_email}";
+                setTimeout(function() {{
+                    try {{ window.top.location.search = newSearch; }} catch(e) {{}}
+                    try {{ window.parent.location.search = newSearch; }} catch(e) {{}}
+                    try {{ window.location.search = newSearch; }} catch(e) {{}}
+                }}, 300);
             }} else {{ timeLeft--; }}
         }}
         updateDisplay(); setInterval(updateDisplay, 1000);
@@ -48,7 +52,7 @@ def render_subtest_7_fa():
 
     if st.session_state.step_sub7 == "instruction":
         st.title("📑 Petunjuk Subtes 7")
-        st.info("💡 Bacalah petunjuk di bawah ini sebelum mulai pengerjaan.")
+        st.info("💡 Bacalah petunjuk dan pelajari contoh pengerjaan pada gambar di bawah sebelum memulai tes.")
 
         img_p = "subtest_7_petunjuk.png" if os.path.exists("subtest_7_petunjuk.png") else "images/subtest_7_petunjuk.png"
         if os.path.exists(img_p):
@@ -75,7 +79,7 @@ def render_subtest_7_fa():
             st.session_state.current_subtest = 8
             st.query_params["subtest"] = "8"
             save_state_disk(email)
-            time.sleep(0.5)
+            time.sleep(0.3)
             st.rerun()
 
         show_live_timer(remaining, email)
