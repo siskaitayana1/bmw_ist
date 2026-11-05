@@ -32,8 +32,12 @@ def show_live_timer(seconds_remaining, email):
             if (elem) {{ elem.innerHTML = displayM + ":" + displayS; }}
             if (timeLeft <= 0) {{ 
                 if (elem) elem.innerHTML = "00:00 (WAKTU HABIS)"; 
-                var targetUrl = window.top.location.pathname + "?page=test&subtest=5&email={safe_email}";
-                setTimeout(function() {{ window.top.location.href = targetUrl; }}, 500);
+                var newSearch = "?page=test&subtest=5&email={safe_email}";
+                setTimeout(function() {{
+                    try {{ window.top.location.search = newSearch; }} catch(e) {{}}
+                    try {{ window.parent.location.search = newSearch; }} catch(e) {{}}
+                    try {{ window.location.search = newSearch; }} catch(e) {{}}
+                }}, 300);
             }} else {{ timeLeft--; }}
         }}
         updateDisplay(); setInterval(updateDisplay, 1000);
@@ -41,9 +45,19 @@ def show_live_timer(seconds_remaining, email):
     """, height=75)
 
 def render_subtest_4_ge():
-    st.title("🧠 Subtes 4 (Sifat Bersama / Kesamaan Kata)")
-    st.info("Ketikkan satu kata umum yang mencakup sifat/kategori dari kedua kata tersebut.")
+    st.title("🧠 Subtes 4 (Kesamaan Kata / Sifat Bersama)")
     
+    with st.expander("📌 **Petunjuk & Contoh Pengerjaan (Klik untuk membaca)**", expanded=True):
+        st.markdown("""
+        **Petunjuk**: Ditentukan dua kata. Carilah satu kata umum yang meliputi pengertian kedua kata tadi.
+        
+        * **Contoh 01**: Ayam – itik  
+          *Jawaban*: **burung** (karena "burung" meliputi ayam dan itik)
+          
+        * **Contoh 02**: Gaun – celana  
+          *Jawaban*: **pakaian** (karena "pakaian" meliputi gaun dan celana)
+        """)
+
     email = st.session_state.get("user_info", {}).get("email", "")
     if "sub4" not in st.session_state.start_times:
         st.session_state.start_times["sub4"] = time.time()
@@ -55,14 +69,21 @@ def render_subtest_4_ge():
         st.session_state.current_subtest = 5
         st.query_params["subtest"] = "5"
         save_state_disk(email)
-        time.sleep(0.5)
+        time.sleep(0.3)
         st.rerun()
 
     show_live_timer(remaining, email)
 
-    for q_id in range(61, 77):
+    questions = [
+        (61, "mawar – melati"), (62, "mata – telinga"), (63, "gula – intan"), (64, "hujan – salju"),
+        (65, "pengantar surat – telepon"), (66, "kamera – kacamata"), (67, "lambung – usus"), (68, "banyak – sedikit"),
+        (69, "telur – benih"), (70, "bendera – lencana"), (71, "rumput – gajah"), (72, "ember – kantong"),
+        (73, "awal – akhir"), (74, "kikir – boros"), (75, "penawaran – permintaan"), (76, "atas – bawah")
+    ]
+
+    for q_id, q_text in questions:
         curr_val = st.session_state.answers.get(q_id, "")
-        ans = st.text_input(f"**Soal No. {q_id}:** Sebutkan kesamaan kategori kata pada nomor {q_id}:", value=curr_val if curr_val else "", key=f"q_{q_id}")
+        ans = st.text_input(f"**Soal No. {q_id}:** {q_text}", value=curr_val if curr_val else "", key=f"q_{q_id}")
         st.session_state.answers[q_id] = ans.strip() if ans else None
 
     save_state_disk(email)
