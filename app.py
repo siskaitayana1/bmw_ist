@@ -4,7 +4,7 @@ import os
 import json
 from datetime import datetime
 
-# Import modul subtes 1 sampai 8 dari folder subtests
+# Impor 8 modul subtes dari folder 'subtests'
 from subtests.subtest_1_se import render_subtest_1_se
 from subtests.subtest_2_wa import render_subtest_2_wa
 from subtests.subtest_3_an import render_subtest_3_an
@@ -14,6 +14,7 @@ from subtests.subtest_6_zr import render_subtest_6_zr
 from subtests.subtest_7_fa import render_subtest_7_fa
 from subtests.subtest_8_wu import render_subtest_8_wu
 
+# --- KONFIGURASI HALAMAN ---
 st.set_page_config(
     page_title="Portal Psikotes Potensi Karyawan",
     page_icon="🧠",
@@ -22,6 +23,7 @@ st.set_page_config(
 
 RESULTS_FILE = "rekap_psikotes_karyawan.csv"
 
+# --- HELPER SIMPAN STATE SEMENTARA (AMAN MULTI-USER) ---
 def get_temp_filename(email):
     safe_id = "".join(c for c in email if c.isalnum()) if email else "default"
     return f"temp_state_{safe_id}.json"
@@ -61,48 +63,47 @@ def load_app_state(email):
             pass
     return {}, {}, 1, {}
 
-# Kunci Jawaban Resmi Subtes 1 - 8
+# --- KUNCI JAWABAN RESMI SUBTES 1 - 8 ---
 ANSWER_KEYS_MC = {
-    # Subtes 1 (SE)
+    # Subtes 1
     1: "e) kewibawaan", 2: "c) boros", 3: "d) gempa bumi", 4: "d) khianat", 5: "d) kuku",
     6: "b) biasanya", 7: "c) lemak", 8: "a) lawan", 9: "e) hipotesis", 10: "b) sol",
     11: "c) kotak PPPK", 12: "d) 20", 13: "d) konservatif", 14: "e) selalu", 15: "c) 800",
     16: "a) kekuatan", 17: "b) biasanya", 18: "b) Bandung", 19: "c) kemungkinan menang", 20: "b) 130",
 
-    # Subtes 2 (WA)
+    # Subtes 2
     21: "b) panah", 22: "b) memaki", 23: "d) isi", 24: "c) melepaskan", 25: "c) perjalanan",
     26: "c) tugas", 27: "c) payung", 28: "d) kasar", 29: "d) sepeda", 30: "a) biola",
     31: "e) lurus", 32: "a) jam", 33: "a) kebijaksanaan", 34: "b) berjalan", 35: "c) potret",
     36: "a) panjang", 37: "d) gunting", 38: "e) masyarakat", 39: "b) menasehati", 40: "c) bulu",
 
-    # Subtes 3 (AN)
+    # Subtes 3
     41: "c) melupakan", 42: "e) sangkar", 43: "d) jalan raya", 44: "d) gelang", 45: "d) kubus",
     46: "a) menawarkan", 47: "d) tengik", 48: "b) sungai", 49: "e) pelindung", 50: "d) tukang emas",
     51: "c) nada", 52: "c) kelakar", 53: "c) suasana hati", 54: "c) sutra", 55: "d) panjang senar",
     56: "c) mutasi", 57: "c) es", 58: "d) dikikir", 59: "e) mikroskop", 60: "e) lautan api",
 
-    # Subtes 5 (RA)
+    # Subtes 5
     77: "35", 78: "280", 79: "205", 80: "26", 81: "30",
     82: "70", 83: "45", 84: "50", 85: "84", 86: "78",
     87: "19", 88: "6", 89: "75", 90: "90", 91: "120",
     92: "17", 93: "36", 94: "5", 95: "48", 96: "1",
 
-    # Subtes 6 (ZR)
+    # Subtes 6
     97: "27", 98: "25", 99: "27", 100: "15", 101: "46",
     102: "10", 103: "42", 104: "7", 105: "5", 106: "14",
     107: "8", 108: "14", 109: "45", 110: "63", 111: "12",
     112: "80", 113: "14", 114: "12", 115: "63", 116: "10",
 
-    # Subtes 7 (FA)
+    # Subtes 7
     117: "a", 118: "c", 119: "d", 120: "b", 121: "d", 122: "e", 123: "c", 124: "e", 125: "e",
     126: "d", 127: "d", 128: "b", 129: "d", 130: "c", 131: "b", 132: "e", 133: "b", 134: "d", 135: "c", 136: "a",
 
-    # Subtes 8 (WU)
+    # Subtes 8
     137: "a", 138: "c", 139: "d", 140: "e", 141: "a", 142: "c", 143: "d", 144: "c", 145: "e",
     146: "a", 147: "b", 148: "d", 149: "e", 150: "b", 151: "d", 152: "b", 153: "a", 154: "e", 155: "b", 156: "c"
 }
 
-# Subtes 4 Rubrik Penilaian (GE)
 GE_KEYS = {
     61: {2: ["bunga", "kembang", "perdu"], 1: ["tumbuhan", "tumbuh-tumbuhan", "tangkai", "harum"]},
     62: {2: ["alat indera", "indera", "panca indera"], 1: ["organ", "alat tubuh"]},
@@ -152,6 +153,7 @@ def calculate_scores():
         "Subtes_7": score_sub7, "Subtes_8": score_sub8, "Total_Skor_Mentah": total_raw
     }
 
+# --- INITIALIZATION SESI ---
 params = st.query_params
 param_email = params.get("email", "")
 
@@ -179,6 +181,7 @@ if param_email:
     if "subtest" in params:
         st.session_state.current_subtest = int(params["subtest"])
 
+# --- ROUTING HALAMAN ---
 if st.session_state.page == "register":
     st.title("🏛️ Portal Psikotes Potensi Karyawan")
     st.subheader("Registrasi Peserta Ujian Online")
