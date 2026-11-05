@@ -4,7 +4,7 @@ import os
 import json
 from datetime import datetime
 
-# Impor 8 modul subtes dari folder 'subtests'
+# Import modul dari folder subtests
 from subtests.subtest_1_se import render_subtest_1_se
 from subtests.subtest_2_wa import render_subtest_2_wa
 from subtests.subtest_3_an import render_subtest_3_an
@@ -14,7 +14,6 @@ from subtests.subtest_6_zr import render_subtest_6_zr
 from subtests.subtest_7_fa import render_subtest_7_fa
 from subtests.subtest_8_wu import render_subtest_8_wu
 
-# --- KONFIGURASI HALAMAN ---
 st.set_page_config(
     page_title="Portal Psikotes Potensi Karyawan",
     page_icon="🧠",
@@ -23,7 +22,6 @@ st.set_page_config(
 
 RESULTS_FILE = "rekap_psikotes_karyawan.csv"
 
-# --- HELPER SIMPAN STATE SEMENTARA (AMAN MULTI-USER) ---
 def get_temp_filename(email):
     safe_id = "".join(c for c in email if c.isalnum()) if email else "default"
     return f"temp_state_{safe_id}.json"
@@ -63,7 +61,7 @@ def load_app_state(email):
             pass
     return {}, {}, 1, {}
 
-# --- KUNCI JAWABAN RESMI SUBTES 1 - 8 ---
+# Kunci Jawaban Resmi
 ANSWER_KEYS_MC = {
     # Subtes 1
     1: "e) kewibawaan", 2: "c) boros", 3: "d) gempa bumi", 4: "d) khianat", 5: "d) kuku",
@@ -153,7 +151,6 @@ def calculate_scores():
         "Subtes_7": score_sub7, "Subtes_8": score_sub8, "Total_Skor_Mentah": total_raw
     }
 
-# --- INITIALIZATION SESI ---
 params = st.query_params
 param_email = params.get("email", "")
 
@@ -181,7 +178,6 @@ if param_email:
     if "subtest" in params:
         st.session_state.current_subtest = int(params["subtest"])
 
-# --- ROUTING HALAMAN ---
 if st.session_state.page == "register":
     st.title("🏛️ Portal Psikotes Potensi Karyawan")
     st.subheader("Registrasi Peserta Ujian Online")
