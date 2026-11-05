@@ -32,8 +32,12 @@ def show_live_timer(seconds_remaining, email):
             if (elem) {{ elem.innerHTML = displayM + ":" + displayS; }}
             if (timeLeft <= 0) {{ 
                 if (elem) elem.innerHTML = "00:00 (WAKTU HABIS)"; 
-                var targetUrl = window.top.location.pathname + "?page=test&subtest=4&email={safe_email}";
-                setTimeout(function() {{ window.top.location.href = targetUrl; }}, 500);
+                var newSearch = "?page=test&subtest=4&email={safe_email}";
+                setTimeout(function() {{
+                    try {{ window.top.location.search = newSearch; }} catch(e) {{}}
+                    try {{ window.parent.location.search = newSearch; }} catch(e) {{}}
+                    try {{ window.location.search = newSearch; }} catch(e) {{}}
+                }}, 300);
             }} else {{ timeLeft--; }}
         }}
         updateDisplay(); setInterval(updateDisplay, 1000);
@@ -42,8 +46,20 @@ def show_live_timer(seconds_remaining, email):
 
 def render_subtest_3_an():
     st.title("🧠 Subtes 3 (Persamaan Kata / Analogi)")
-    st.info("Pilihlah kata yang memiliki hubungan analogi setara.")
     
+    with st.expander("📌 **Petunjuk & Contoh Pengerjaan (Klik untuk membaca)**", expanded=True):
+        st.markdown("""
+        **Petunjuk**: Antara kata pertama dan kedua terdapat hubungan tertentu. Antara kata ketiga dan salah satu kata pilihan harus memiliki hubungan setara.
+        
+        * **Contoh 01**: Hutan : pohon = tembok : ?  
+          a) batu bata &nbsp;&nbsp; b) rumah &nbsp;&nbsp; c) semen &nbsp;&nbsp; d) putih &nbsp;&nbsp; e) dinding  
+          *Jawaban yang benar*: **a) batu bata** (karena hutan terdiri atas pohon-pohon, dan tembok terdiri atas batu bata)
+          
+        * **Contoh 02**: Gelap : terang = basah : ?  
+          a) hujan &nbsp;&nbsp; b) hari &nbsp;&nbsp; c) lembab &nbsp;&nbsp; d) angin &nbsp;&nbsp; e) kering  
+          *Jawaban yang benar*: **e) kering** (karena gelap lawan dari terang, dan basah lawan dari kering)
+        """)
+
     email = st.session_state.get("user_info", {}).get("email", "")
     if "sub3" not in st.session_state.start_times:
         st.session_state.start_times["sub3"] = time.time()
@@ -55,17 +71,39 @@ def render_subtest_3_an():
         st.session_state.current_subtest = 4
         st.query_params["subtest"] = "4"
         save_state_disk(email)
-        time.sleep(0.5)
+        time.sleep(0.3)
         st.rerun()
 
     show_live_timer(remaining, email)
 
-    opts_sample = ["a) Opsi A", "b) Opsi B", "c) melupakan", "d) Opsi D", "e) Opsi E"]
-    for q_id in range(41, 61):
-        st.markdown(f"**Soal No. {q_id}:** Pilihlah hubungan analogi yang setara.")
+    questions = [
+        (41, "Menemukan : menghilangkan = Mengingat : ?", ["a) menghapal", "b) mengenai", "c) melupakan", "d) berpikir", "e) memimpikan"]),
+        (42, "Bunga : jambangan = Burung : ?", ["a) sarang", "b) langit", "c) pagar", "d) pohon", "e) sangkar"]),
+        (43, "Kereta api : rel = Otobis : ?", ["a) roda", "b) poros", "c) ban", "d) jalan raya", "e) kecepatan"]),
+        (44, "Perak : emas = Cincin : ?", ["a) arloji", "b) berlian", "c) permata", "d) gelang", "e) platin"]),
+        (45, "Lingkaran : bola = Bujur sangkar : ?", ["a) bentuk", "b) gambar", "c) segi empat", "d) kubus", "e) piramid"]),
+        (46, "Saran : kepustakaan = Merundingkan : ?", ["a) menawarkan", "b) menentukan", "c) menilai", "d) menimbang", "e) merenungkan"]),
+        (47, "Lidah : asam = Hidung : ?", ["a) mencium", "b) bernapas", "c) mengecap", "d) tengik", "e) asin"]),
+        (48, "Darah : pembuluh = Air : ?", ["a) pintu air", "b) sungai", "c) talang", "d) hujan", "e) ember"]),
+        (49, "Saraf : penyalur = Pupil : ?", ["a) penyinaran", "b) mata", "c) melihat", "d) cahaya", "e) pelindung"]),
+        (50, "Pengantar surat : pengantar telegram = Pandai besi : ?", ["a) palu godam", "b) pedagang besi", "c) api", "d) tukang emas", "e) besi tempa"]),
+        (51, "Buta : warna = Tuli : ?", ["a) pendengaran", "b) mendengar", "c) nada", "d) kata", "e) telinga"]),
+        (52, "Makanan : bumbu = Ceramah : ?", ["a) penghinaan", "b) pidato", "c) kelakar", "d) kesan", "e) ayat"]),
+        (53, "Marah : emosi = Duka cita : ?", ["a) suka cita", "b) sakit hati", "c) suasana hati", "d) sedih", "e) rindu"]),
+        (54, "Mantel : jubah = wool : ?", ["a) bahan sandang", "b) domba", "c) sutra", "d) jas", "e) tekstil"]),
+        (55, "Ketinggian puncak : tekanan udara = ketinggian nada : ?", ["a) garpu tala", "b) sopran", "c) nyanyian", "d) panjang senar", "e) suara"]),
+        (56, "Negara : revolusi = Hidup : ?", ["a) biologi", "b) keturunan", "c) mutasi", "d) seleksi", "e) ilmu hewan"]),
+        (57, "Kekurangan : penemuan = Panas : ?", ["a) haus", "b) khatulistiwa", "c) es", "d) matahari", "e) dingin"]),
+        (58, "Kayu : diketam = Besi : ?", ["a) dipalu", "b) digergaji", "c) dituang", "d) dikikir", "e) ditempa"]),
+        (59, "Olahragawan : lembing = Cendekiawan : ?", ["a) perpustakaan", "b) penelitian", "c) karya", "d) studi", "e) mikroskop"]),
+        (60, "Keledai : kuda pacuan = Pembakaran : ?", ["a) pemadam api", "b) obor", "c) letupan", "d) korek api", "e) lautan api"])
+    ]
+
+    for q_id, q_text, opts in questions:
+        st.markdown(f"**Soal No. {q_id}:** {q_text}")
         curr_val = st.session_state.answers.get(q_id, None)
-        idx = opts_sample.index(curr_val) if curr_val in opts_sample else None
-        ans = st.radio(f"Jawaban No. {q_id}:", options=opts_sample, index=idx, key=f"q_{q_id}")
+        idx = opts.index(curr_val) if curr_val in opts else None
+        ans = st.radio(f"Jawaban No. {q_id}:", options=opts, index=idx, key=f"q_{q_id}")
         st.session_state.answers[q_id] = ans
 
     save_state_disk(email)
