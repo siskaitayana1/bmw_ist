@@ -4,7 +4,6 @@ import os
 import json
 from datetime import datetime
 
-# Import modul dari folder subtests
 from subtests.subtest_1_se import render_subtest_1_se
 from subtests.subtest_2_wa import render_subtest_2_wa
 from subtests.subtest_3_an import render_subtest_3_an
@@ -61,7 +60,6 @@ def load_app_state(email):
             pass
     return {}, {}, 1, {}
 
-# Kunci Jawaban Resmi
 ANSWER_KEYS_MC = {
     # Subtes 1
     1: "e) kewibawaan", 2: "c) boros", 3: "d) gempa bumi", 4: "d) khianat", 5: "d) kuku",
@@ -240,17 +238,21 @@ elif st.session_state.page == "result":
     st.title("✅ Psikotes Selesai")
     st.success(f"Terima kasih **{st.session_state.user_info.get('nama', '')}**, seluruh jawaban Anda telah berhasil disimpan.")
 
-    scores = calculate_scores()
-    record = {**st.session_state.user_info, **scores}
+    # Simpan hasil sekali ke CSV (Cegah duplikasi saat reload)
+    if "saved_to_csv" not in st.session_state:
+        scores = calculate_scores()
+        record = {**st.session_state.user_info, **scores}
 
-    df_new = pd.DataFrame([record])
-    if os.path.exists(RESULTS_FILE):
-        df_old = pd.read_csv(RESULTS_FILE, sep=';')
-        df_final = pd.concat([df_old, df_new], ignore_index=True)
-    else:
-        df_final = df_new
+        df_new = pd.DataFrame([record])
+        if os.path.exists(RESULTS_FILE):
+            df_old = pd.read_csv(RESULTS_FILE, sep=';')
+            df_final = pd.concat([df_old, df_new], ignore_index=True)
+            df_final = df_final.drop_duplicates(subset=['email', 'tanggal'], keep='last')
+        else:
+            df_final = df_new
 
-    df_final.to_csv(RESULTS_FILE, index=False, sep=';', encoding='utf-8-sig')
+        df_final.to_csv(RESULTS_FILE, index=False, sep=';', encoding='utf-8-sig')
+        st.session_state.saved_to_csv = True
 
     st.info("Data hasil ujian Anda telah tersimpan secara otomatis di dalam sistem.")
     st.markdown("---")
